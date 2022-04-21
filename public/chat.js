@@ -1,4 +1,5 @@
-let socket = io.connect("http://localhost:4000");
+//let socket = io.connect("http://localhost:4000");
+let socket = io.connect("https://" + window.location.hostname);
 let divVideoChatLobby = document.getElementById("video-chat-lobby");
 let divVideoChat = document.getElementById("video-chat-room");
 let joinButton = document.getElementById("join");
@@ -87,6 +88,7 @@ socket.on("full", function () {
 // Triggered when a peer has joined the room and ready to communicate.
 
 socket.on("ready", function () {
+  console.log("client " + creator + " on ready:")
   if (creator) {
     rtcPeerConnection = new RTCPeerConnection(iceServers);
     rtcPeerConnection.onicecandidate = OnIceCandidateFunction;
@@ -109,6 +111,7 @@ socket.on("ready", function () {
 // Triggered on receiving an ice candidate from the peer.
 
 socket.on("candidate", function (candidate) {
+  console.log("client " + creator + " on candidate:", candidate)
   let icecandidate = new RTCIceCandidate(candidate);
   rtcPeerConnection.addIceCandidate(icecandidate);
 });
@@ -116,6 +119,7 @@ socket.on("candidate", function (candidate) {
 // Triggered on receiving an offer from the person who created the room.
 
 socket.on("offer", function (offer) {
+  console.log("client " + creator + " on offer:", offer)
   if (!creator) {
     rtcPeerConnection = new RTCPeerConnection(iceServers);
     rtcPeerConnection.onicecandidate = OnIceCandidateFunction;
@@ -138,6 +142,7 @@ socket.on("offer", function (offer) {
 // Triggered on receiving an answer from the person who joined the room.
 
 socket.on("answer", function (answer) {
+  console.log("client " + creator + " on answer:", answer)
   rtcPeerConnection.setRemoteDescription(answer);
 });
 
@@ -145,6 +150,7 @@ socket.on("answer", function (answer) {
 
 function OnIceCandidateFunction(event) {
   console.log("Candidate");
+  console.log("client " + creator + " on OnIceCandidateFunction:", event)
   if (event.candidate) {
     socket.emit("candidate", event.candidate, roomName);
   }
